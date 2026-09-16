@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Tugas</title>
-    <meta name="description" content="Form upload tugas: gambar, video, link, dan dokumen.">
+    <meta name="description" content="Form upload tugas: gambar, video, link, dokumen, dan audio.">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: #f1f5f9; color: #1e293b; line-height: 1.6; }
@@ -17,20 +17,12 @@
             box-shadow: 0 1px 4px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 50;
         }
         .brand {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #4f46e5;
-            text-decoration: none;
-            padding: .4rem .6rem;
-            border-radius: 8px;
-            transition: background .15s;
+            font-weight: 700; font-size: 1.1rem; color: #4f46e5;
+            text-decoration: none; padding: .4rem .6rem;
+            border-radius: 8px; transition: background .15s;
         }
-        .brand:hover,
-        .brand:focus {
-            background: #f1f5f9;
-            outline: 2px solid #6366f1;
-            outline-offset: 2px;
-        }
+        .brand:hover, .brand:focus { background: #f1f5f9; outline: 2px solid #6366f1; outline-offset: 2px; }
+
         .profil-menu { position: relative; }
         .profil-trigger {
             display: flex; align-items: center; gap: .75rem; cursor: pointer;
@@ -80,12 +72,13 @@
         .list-tugas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
         article.tugas { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; background: #fafbfd; }
         article.tugas h3 { font-size: 1rem; margin: .5rem 0; }
-        article.tugas img, article.tugas video { max-width: 100%; border-radius: 6px; margin: .5rem 0; }
+        article.tugas img, article.tugas video, article.tugas audio { max-width: 100%; border-radius: 6px; margin: .5rem 0; }
         .badge { display: inline-block; font-size: .7rem; padding: .2rem .6rem; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
         .badge-gambar { background: #dbeafe; color: #1d4ed8; }
         .badge-video { background: #fee2e2; color: #b91c1c; }
         .badge-link { background: #dcfce7; color: #15803d; }
         .badge-dokumen { background: #fef3c7; color: #b45309; }
+        .badge-audio { background: #f3e8ff; color: #7e22ce; }
 
         #fileField, #linkField { display: none; }
         #fileField.active, #linkField.active { display: block; }
@@ -143,8 +136,9 @@
                     <option value="">-- Pilih Jenis --</option>
                     <option value="gambar">Gambar</option>
                     <option value="video">Video</option>
+                    <option value="audio">Audio</option>
                     <option value="link">Link</option>
-                    <option value="dokumen">Dokumen (PDF, DOC, PPT, XLS)</option>
+                    <option value="dokumen">Dokumen (PDF, DOC, PPT, XLS, TXT)</option>
                 </select>
             </fieldset>
 
@@ -152,8 +146,8 @@
                 <legend>Berkas</legend>
                 <label for="file">Pilih File</label>
                 <input type="file" id="file" name="file"
-                       accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt">
-                <small style="color:#64748b;">Maks 50 MB. Format: JPG, PNG, GIF, MP4, WebM, PDF, DOC, PPT, XLS.</small>
+                       accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt">
+                <small style="color:#64748b;">Maks 50 MB. Format: JPG, PNG, GIF, MP4, WebM, MP3, WAV, PDF, DOC, PPT, XLS, TXT.</small>
             </fieldset>
 
             <fieldset id="linkField">
@@ -181,13 +175,19 @@
 
                 <img th:if="${t.jenis == 'gambar'}" th:src="${t.fileUrl}" th:alt="${t.judul}">
                 <video th:if="${t.jenis == 'video'}" th:src="${t.fileUrl}" controls></video>
+                <audio th:if="${t.jenis == 'audio'}" th:src="${t.fileUrl}" controls style="width:100%;"></audio>
 
                 <div style="display:flex;gap:.5rem;margin-top:.75rem;">
                     <a th:if="${t.jenis == 'link'}" th:href="${t.fileUrl}"
                        target="_blank" rel="noopener noreferrer"
                        class="btn btn-primary" style="text-decoration:none;font-size:.8rem;">Buka</a>
-                    <a th:unless="${t.jenis == 'link'}" th:href="${t.fileUrl}"
-                       download class="btn btn-primary" style="text-decoration:none;font-size:.8rem;">Download</a>
+
+                    <a th:unless="${t.jenis == 'link'}" 
+                       th:href="${t.fileUrl}"
+                       th:attr="download=${t.originalName}"
+                       target="_blank"
+                       class="btn btn-primary" 
+                       style="text-decoration:none;font-size:.8rem;">Download</a>
 
                     <form th:action="@{'/upload/hapus/' + ${t.id}}" method="post"
                           onsubmit="return confirm('Hapus tugas ini?');" style="flex:1;">

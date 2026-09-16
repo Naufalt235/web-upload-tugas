@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,6 +50,7 @@ public class UploadController {
             String originalName = null;
             long size = 0;
 
+            // ===== JENIS: LINK =====
             if ("link".equals(jenis)) {
                 if (link == null || link.isBlank()) {
                     model.addAttribute("error", "URL link wajib diisi!");
@@ -57,12 +59,17 @@ public class UploadController {
                 fileUrl = link;
                 originalName = link;
             } else {
+                // ===== JENIS: FILE (gambar, video, dokumen, audio) =====
                 if (file == null || file.isEmpty()) {
                     model.addAttribute("error", "File wajib diupload!");
                     return reload(model);
                 }
 
                 String contentType = file.getContentType();
+                String name = file.getOriginalFilename();
+                String lowerName = name != null ? name.toLowerCase() : "";
+
+                // Validasi tipe file
                 if ("gambar".equals(jenis) && (contentType == null || !contentType.startsWith("image/"))) {
                     model.addAttribute("error", "File harus berupa gambar!");
                     return reload(model);
@@ -71,34 +78,59 @@ public class UploadController {
                     model.addAttribute("error", "File harus berupa video!");
                     return reload(model);
                 }
+                if ("audio".equals(jenis) && (contentType == null || !contentType.startsWith("audio/"))) {
+                    model.addAttribute("error", "File harus berupa audio!");
+                    return reload(model);
+                }
                 if ("dokumen".equals(jenis)) {
-                    String name = file.getOriginalFilename();
-                    if (name == null || !(name.toLowerCase().endsWith(".pdf")
-                            || name.toLowerCase().endsWith(".doc")
-                            || name.toLowerCase().endsWith(".docx")
-                            || name.toLowerCase().endsWith(".ppt")
-                            || name.toLowerCase().endsWith(".pptx")
-                            || name.toLowerCase().endsWith(".xls")
-                            || name.toLowerCase().endsWith(".xlsx")
-                            || name.toLowerCase().endsWith(".txt"))) {
+                    if (!(lowerName.endsWith(".pdf")
+                            || lowerName.endsWith(".doc")
+                            || lowerName.endsWith(".docx")
+                            || lowerName.endsWith(".ppt")
+                            || lowerName.endsWith(".pptx")
+                            || lowerName.endsWith(".xls")
+                            || lowerName.endsWith(".xlsx")
+                            || lowerName.endsWith(".txt"))) {
                         model.addAttribute("error", "File harus berupa dokumen (PDF, DOC, PPT, XLS, TXT)!");
                         return reload(model);
                     }
                 }
 
+                // ===== TENTUKAN resource_type & format untuk Cloudinary =====
                 String resourceType = "auto";
-                if ("video".equals(jenis)) resourceType = "video";
-                if ("dokumen".equals(jenis)) resourceType = "raw";
+                String format = null;
 
-                Map uploadResult = cloudinary.uploader().upload(
-                        file.getBytes(),
-                        ObjectUtils.asMap(
-                                "folder", "web-upload-tugas/tugas",
-                                "resource_type", resourceType,
-                                "use_filename", true,
-                                "unique_filename", true
-                        )
-                );
+                if ("gambar".equals(jenis)) {
+                    resourceType = "image";
+                } else if ("video".equals(jenis)) {
+                    resourceType = "video";
+                } else if ("audio".equals(jenis)) {
+                    resourceType = "video"; // Cloudinary handle audio sebagai video
+                } else if ("dokumen".equals(jenis)) {
+                    if (lowerName.endsWith(".pdf")) {
+                        resourceType = "image"; // PDF → image (biar ada .pdf)
+                    } else {
+                        resourceType = "raw";
+                        // Ambil ekstensi untuk parameter format
+                        if (lowerName.contains(".")) {
+                            format = lowerName.substring(lowerName.lastIndexOf(".") + 1);
+                        }
+                    }
+                }
+
+                // ===== UPLOAD KE CLOUDINARY =====
+                Map<String, Object> options = new HashMap<>();
+                options.put("folder", "web-upload-tugas/tugas");
+                options.put("resource_type", resourceType);
+                options.put("use_filename", true);
+                options.put("unique_filename", true);
+
+                // Tambahkan format (untuk raw dokumen: txt, docx, pptx, xlsx)
+                if (format != null) {
+                    options.put("format", format);
+                }
+
+                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
 
                 fileUrl = (String) uploadResult.get("secure_url");
                 publicId = (String) uploadResult.get("public_id");
@@ -120,6 +152,7 @@ public class UploadController {
         return reload(model);
     }
 
+    // ===== HAPUS TUGAS =====
     @PostMapping("/upload/hapus/{id}")
     public String hapusTugas(@PathVariable String id, Model model) {
         Tugas target = null;
@@ -130,8 +163,23 @@ public class UploadController {
             if (!"link".equals(target.getJenis()) && target.getPublicId() != null) {
                 try {
                     String resourceType = "auto";
-                    if ("video".equals(target.getJenis())) resourceType = "video";
-                    if ("dokumen".equals(target.getJenis())) resourceType = "raw";
+                    String jenis = target.getJenis();
+
+                    if ("gambar".equals(jenis)) {
+                        resourceType = "image";
+                    } else if ("video".equals(jenis)) {
+                        resourceType = "video";
+                    } else if ("audio".equals(jenis)) {
+                        resourceType = "video";
+                    } else if ("dokumen".equals(jenis)) {
+                        String name = target.getOriginalName();
+                        String lowerName = name != null ? name.toLowerCase() : "";
+                        if (lowerName.endsWith(".pdf")) {
+                            resourceType = "image";
+                        } else {
+                            resourceType = "raw";
+                        }
+                    }
 
                     cloudinary.uploader().destroy(
                             target.getPublicId(),

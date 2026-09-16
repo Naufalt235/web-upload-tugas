@@ -14,41 +14,30 @@
         .skip-link { position: absolute; left: -9999px; top: 0; background: #6366f1; color: #fff; padding: .75rem 1rem; }
         .skip-link:focus { left: 0; }
 
-        /* Header */
         header.topbar {
             background: #fff; padding: .9rem 1.5rem;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 1px 4px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 50;
         }
         .brand {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #4f46e5;text-decoration: none;
-            padding: .4rem .6rem;
-            border-radius: 8px;
-            transition: background .15s;
+            font-weight: 700; font-size: 1.1rem; color: #4f46e5;
+            text-decoration: none; padding: .4rem .6rem;
+            border-radius: 8px; transition: background .15s;
         }
-        .brand:hover,
-        .brand:focus {
-             background: #f1f5f9;
-             outline: 2px solid #6366f1;
-             outline-offset: 2px;
-            }
+        .brand:hover, .brand:focus { background: #f1f5f9; outline: 2px solid #6366f1; outline-offset: 2px; }
+
         .profil-menu { position: relative; }
         .profil-trigger {
             display: flex; align-items: center; gap: .75rem;
             cursor: pointer; padding: .4rem .6rem; border-radius: 8px;
             background: none; border: none; font: inherit;
         }
-        .profil-trigger:hover, .profil-trigger:focus { background: #f1f5f9; outline: 2px solid #6366f1; }
+        .profil-trigger:hover, .profil-trigger:focus { background: #f1f5f9; }
         .profil-info { text-align: right; line-height: 1.2; }
         .profil-info .nama { font-weight: 700; font-size: .95rem; }
         .profil-info .nim { font-size: .8rem; color: #64748b; }
         .profil-info .role { font-size: .8rem; color: #94a3b8; }
-        .avatar {
-            width: 44px; height: 44px; border-radius: 50%;
-            object-fit: cover; border: 2px solid #e2e8f0;
-        }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; }
         .dropdown {
             display: none; position: absolute; right: 0; top: calc(100% + 8px);
             background: #fff; border-radius: 10px; min-width: 220px;
@@ -59,21 +48,15 @@
         .dropdown a {
             display: flex; align-items: center; gap: .75rem;
             padding: .8rem 1rem; color: #1e293b; text-decoration: none;
-            font-size: .92rem; transition: background .15s;
+            font-size: .92rem;
         }
-        .dropdown a:hover, .dropdown a:focus { background: #f1f5f9; outline: none; }
+        .dropdown a:hover, .dropdown a:focus { background: #f1f5f9; }
         .dropdown a + a { border-top: 1px solid #f1f5f9; }
-        .dropdown .icon { width: 20px; text-align: center; }
 
-        /* Main */
         main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
         h1.page-title { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a; }
 
-        /* Kartu tugas */
-        .grid-tugas {
-            display: grid; gap: 1.25rem;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        }
+        .grid-tugas { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
         .card {
             background: #fff; border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
@@ -94,11 +77,11 @@
             padding: .2rem .6rem; border-radius: 20px;
             text-transform: uppercase; letter-spacing: .3px;
         }
-        .badge-jenis { background: #e0e7ff; color: #4338ca; }
         .badge-gambar { background: #dbeafe; color: #1d4ed8; }
         .badge-video { background: #fee2e2; color: #b91c1c; }
         .badge-link { background: #dcfce7; color: #15803d; }
         .badge-dokumen { background: #fef3c7; color: #b45309; }
+        .badge-audio { background: #f3e8ff; color: #7e22ce; }
 
         .card h3 { font-size: 1rem; margin-bottom: .4rem; color: #0f172a; }
         .card .deskripsi { font-size: .85rem; color: #64748b; flex: 1; margin-bottom: .75rem; }
@@ -110,12 +93,7 @@
         }
         .btn-primary { background: #6366f1; color: #fff; }
         .btn-primary:hover, .btn-primary:focus { background: #4f46e5; }
-        .btn-danger { background: #fee2e2; color: #b91c1c; }
-        .btn-danger:hover, .btn-danger:focus { background: #fecaca; }
-        .btn-secondary { background: #e2e8f0; color: #334155; }
-        .btn-secondary:hover, .btn-secondary:focus { background: #cbd5e1; }
 
-        /* Empty state */
         .empty-state {
             grid-column: 1 / -1;
             background: #fff; padding: 3rem 2rem; border-radius: 12px;
@@ -126,20 +104,15 @@
         .empty-state h2 { color: #0f172a; font-size: 1.2rem; margin-bottom: .5rem; }
         .empty-state p { margin-bottom: 1.5rem; }
 
-        footer {
-            text-align: center; padding: 2rem 1rem;
-            color: #94a3b8; font-size: .85rem;
-        }
+        footer { text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: .85rem; }
     </style>
 </head>
 <body>
 
 <a href="#main" class="skip-link">Lewati ke konten utama</a>
 
-<!-- ============ HEADER DENGAN MENU PROFIL ============ -->
 <header class="topbar">
     <a href="/" class="brand">Beranda Tugas</a>
-
     <div class="profil-menu">
         <button type="button" class="profil-trigger" onclick="toggleDropdown(event)"
                 aria-haspopup="true" aria-expanded="false" aria-label="Menu profil">
@@ -150,22 +123,19 @@
             </div>
             <img class="avatar" th:src="${profil.fotoUrl}" alt="Foto profil" width="44" height="44">
         </button>
-
         <nav class="dropdown" id="dropdownProfil" aria-label="Menu profil">
-            <a href="/profil"><span class="icon">👤</span> Profil</a>
-            <a href="/profil/cv"><span class="icon">📄</span> CV</a>
-            <a href="/upload"><span class="icon">📤</span> Upload Tugas</a>
+            <a href="/profil">👤 Profil</a>
+            <a href="/profil/cv">📄 CV</a>
+            <a href="/upload">📤 Upload Tugas</a>
         </nav>
     </div>
 </header>
 
-<!-- ============ MAIN ============ -->
 <main id="main">
     <h1 class="page-title">Semua Tugas Terunggah</h1>
 
     <div class="grid-tugas">
 
-        <!-- Empty state -->
         <div class="empty-state" th:if="${#lists.isEmpty(daftarTugas)}">
             <div class="icon">📭</div>
             <h2>Belum ada tugas yang diupload</h2>
@@ -175,11 +145,11 @@
             </a>
         </div>
 
-        <!-- Daftar tugas -->
         <article class="card" th:each="t : ${daftarTugas}">
             <div class="card-thumb">
                 <img th:if="${t.jenis == 'gambar'}" th:src="${t.fileUrl}" th:alt="${t.judul}">
                 <span th:if="${t.jenis == 'video'}">🎬</span>
+                <span th:if="${t.jenis == 'audio'}">🎵</span>
                 <span th:if="${t.jenis == 'link'}">🔗</span>
                 <span th:if="${t.jenis == 'dokumen'}">📄</span>
             </div>
@@ -195,8 +165,12 @@
                     <a th:if="${t.jenis == 'link'}" th:href="${t.fileUrl}"
                        target="_blank" rel="noopener noreferrer"
                        class="btn btn-primary">Buka Link</a>
-                    <a th:unless="${t.jenis == 'link'}" th:href="${t.fileUrl}"
-                       download class="btn btn-primary">Download</a>
+
+                    <a th:unless="${t.jenis == 'link'}" 
+                       th:href="${t.fileUrl}"
+                       th:attr="download=${t.originalName}"
+                       target="_blank"
+                       class="btn btn-primary">Download</a>
                 </div>
             </div>
         </article>
