@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Tugas Saya</title>
+    <meta name="description" content="Halaman profil mahasiswa — ubah nama, NIM, dan foto profil.">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: #f1f5f9; color: #1e293b; line-height: 1.6; }
+        .skip-link { position: absolute; left: -9999px; top: 0; background: #6366f1; color: #fff; padding: .75rem 1rem; }
+        .skip-link:focus { left: 0; }
+
+        header.topbar {
+            background: #fff; padding: .9rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 50;
+        }
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #4f46e5;
+            text-decoration: none;
+            padding: .4rem .6rem;
+            border-radius: 8px;
+            transition: background .15s;
+        }
+        .brand:hover,
+        .brand:focus {
+            background: #f1f5f9;
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
+        .profil-menu { position: relative; }
+        .profil-trigger {
+            display: flex; align-items: center; gap: .75rem; cursor: pointer;
+            padding: .4rem .6rem; border-radius: 8px; background: none; border: none; font: inherit;
+        }
+        .profil-trigger:hover, .profil-trigger:focus { background: #f1f5f9; }
+        .profil-info { text-align: right; line-height: 1.2; }
+        .profil-info .nama { font-weight: 700; font-size: .95rem; }
+        .profil-info .nim { font-size: .8rem; color: #64748b; }
+        .profil-info .role { font-size: .8rem; color: #94a3b8; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; }
+        .dropdown {
+            display: none; position: absolute; right: 0; top: calc(100% + 8px);
+            background: #fff; border-radius: 10px; min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.12); overflow: hidden; border: 1px solid #e2e8f0;
+        }
+        .dropdown.show { display: block; }
+        .dropdown a {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .8rem 1rem; color: #1e293b; text-decoration: none; font-size: .92rem;
+        }
+        .dropdown a:hover, .dropdown a:focus { background: #f1f5f9; }
+        .dropdown a + a { border-top: 1px solid #f1f5f9; }
+
+        main { max-width: 720px; margin: 2rem auto; padding: 0 1.5rem; }
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a; }
+
+        .card { background: #fff; border-radius: 12px; padding: 1.75rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 1.5rem; }
+
+        .foto-section { text-align: center; margin-bottom: 1.5rem; }
+        .foto-large {
+            width: 140px; height: 140px; border-radius: 50%;
+            object-fit: cover; border: 4px solid #e2e8f0; margin-bottom: 1rem;
+        }
+        .foto-form { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+        .foto-form input[type=file] { font-size: .85rem; }
+
+        label { display: block; margin-top: 1rem; font-weight: 600; font-size: .9rem; }
+        input[type=text] {
+            width: 100%; padding: .65rem .8rem; border: 1px solid #cbd5e1;
+            border-radius: 6px; font: inherit; margin-top: .25rem;
+        }
+        input[type=text]:focus { outline: 2px solid #6366f1; outline-offset: 1px; border-color: #6366f1; }
+
+        .btn { padding: .65rem 1.5rem; border-radius: 6px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-primary:hover, .btn-primary:focus { background: #4f46e5; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover, .btn-secondary:focus { background: #cbd5e1; }
+
+        .alert { padding: .75rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }
+        .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+        .info-preview {
+            background: #f8fafc; padding: 1rem; border-radius: 8px;
+            margin-top: 1.5rem; font-size: .88rem; color: #64748b;
+            border-left: 3px solid #6366f1;
+        }
+
+        footer { text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: .85rem; }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Lewati ke konten utama</a>
+
+<header class="topbar">
+    <a href="/" class="brand">Beranda Tugas</a>
+    <div class="profil-menu">
+        <button type="button" class="profil-trigger" onclick="toggleDropdown(event)"
+                aria-haspopup="true" aria-expanded="false" aria-label="Menu profil">
+            <div class="profil-info">
+                <div class="nama" th:text="${profil.namaLengkap}">Naufal Ramadhan</div>
+                <div class="nim" th:text="${profil.nim}">1247050103</div>
+                <div class="role">Mahasiswa</div>
+            </div>
+            <img class="avatar" th:src="${profil.fotoUrl}" alt="Foto profil" width="44" height="44">
+        </button>
+        <nav class="dropdown" id="dropdownProfil" aria-label="Menu profil">
+            <a href="/profil"><span>👤</span> Profil</a>
+            <a href="/profil/cv"><span>📄</span> CV</a>
+            <a href="/upload"><span>📤</span> Upload Tugas</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+    <h1>Profil Saya</h1>
+
+    <!-- Alert -->
+    <div class="alert alert-success" th:if="${sukses}" role="status" th:text="${sukses}"></div>
+    <div class="alert alert-error" th:if="${error}" role="alert" th:text="${error}"></div>
+
+    <!-- Kartu Foto Profil -->
+    <section class="card">
+        <h2 style="font-size:1.1rem;margin-bottom:1rem;">Foto Profil</h2>
+        <div class="foto-section">
+            <img class="foto-large" th:src="${profil.fotoUrl}" alt="Foto profil saat ini">
+            <form class="foto-form" method="post" action="/profil/upload-foto" enctype="multipart/form-data">
+                <label for="foto" style="margin:0;">Ganti Foto (dari perangkat)</label>
+                <input type="file" id="foto" name="foto" accept="image/*" required>
+                <button type="submit" class="btn btn-primary">Upload Foto</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Kartu Data Diri -->
+    <section class="card">
+        <h2 style="font-size:1.1rem;margin-bottom:1rem;">Data Diri</h2>
+        <form method="post" action="/profil/update">
+            <label for="namaDepan">Nama Depan</label>
+            <input type="text" id="namaDepan" name="namaDepan" th:value="${profil.namaDepan}" required>
+
+            <label for="namaBelakang">Nama Belakang</label>
+            <input type="text" id="namaBelakang" name="namaBelakang" th:value="${profil.namaBelakang}" required>
+
+            <label for="nim">NIM</label>
+            <input type="text" id="nim" name="nim" th:value="${profil.nim}" required>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:1.25rem;">Simpan Perubahan</button>
+        </form>
+
+        <div class="info-preview">
+            ℹ️ Data ini akan ditampilkan di <strong>pojok kanan atas</strong> semua halaman
+            (Beranda, Upload Tugas, CV) dalam format:
+            <strong th:text="${profil.namaLengkap} + ' / ' + ${profil.nim}">Naufal Ramadhan / 1247050103</strong>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2026 Tugas Saya</p>
+</footer>
+
+<script>
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('dropdownProfil');
+        const open = dd.classList.toggle('show');
+        e.currentTarget.setAttribute('aria-expanded', open);
+    }
+    document.addEventListener('click', () => document.getElementById('dropdownProfil').classList.remove('show'));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('dropdownProfil').classList.remove('show'); });
+</script>
+</body>
+</html>

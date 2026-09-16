@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Tugas</title>
+    <meta name="description" content="Form upload tugas: gambar, video, link, dan dokumen.">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: #f1f5f9; color: #1e293b; line-height: 1.6; }
+        .skip-link { position: absolute; left: -9999px; top: 0; background: #6366f1; color: #fff; padding: .75rem 1rem; }
+        .skip-link:focus { left: 0; }
+
+        header.topbar {
+            background: #fff; padding: .9rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 50;
+        }
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #4f46e5;
+            text-decoration: none;
+            padding: .4rem .6rem;
+            border-radius: 8px;
+            transition: background .15s;
+        }
+        .brand:hover,
+        .brand:focus {
+            background: #f1f5f9;
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
+        .profil-menu { position: relative; }
+        .profil-trigger {
+            display: flex; align-items: center; gap: .75rem; cursor: pointer;
+            padding: .4rem .6rem; border-radius: 8px; background: none; border: none; font: inherit;
+        }
+        .profil-trigger:hover, .profil-trigger:focus { background: #f1f5f9; }
+        .profil-info { text-align: right; line-height: 1.2; }
+        .profil-info .nama { font-weight: 700; font-size: .95rem; }
+        .profil-info .nim { font-size: .8rem; color: #64748b; }
+        .profil-info .role { font-size: .8rem; color: #94a3b8; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; }
+        .dropdown {
+            display: none; position: absolute; right: 0; top: calc(100% + 8px);
+            background: #fff; border-radius: 10px; min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.12); border: 1px solid #e2e8f0;
+        }
+        .dropdown.show { display: block; }
+        .dropdown a { display: flex; gap: .75rem; padding: .8rem 1rem; color: #1e293b; text-decoration: none; font-size: .92rem; }
+        .dropdown a:hover, .dropdown a:focus { background: #f1f5f9; }
+        .dropdown a + a { border-top: 1px solid #f1f5f9; }
+
+        main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+        section.card { background: #fff; padding: 1.75rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+        h2 { color: #4f46e5; font-size: 1.15rem; margin-bottom: 1rem; }
+
+        fieldset { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        legend { font-weight: 600; padding: 0 .5rem; color: #334155; }
+        label { display: block; margin-top: .75rem; font-weight: 600; font-size: .9rem; }
+        input[type=text], input[type=url], textarea, select {
+            width: 100%; padding: .65rem .8rem; border: 1px solid #cbd5e1;
+            border-radius: 6px; font: inherit; margin-top: .25rem;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid #6366f1; outline-offset: 1px; border-color: #6366f1;
+        }
+        button.btn { padding: .7rem 1.5rem; border-radius: 6px; font-size: .92rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-primary:hover, .btn-primary:focus { background: #4f46e5; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .btn-danger:hover, .btn-danger:focus { background: #fecaca; }
+
+        .alert { padding: .75rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }
+        .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+        .list-tugas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+        article.tugas { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; background: #fafbfd; }
+        article.tugas h3 { font-size: 1rem; margin: .5rem 0; }
+        article.tugas img, article.tugas video { max-width: 100%; border-radius: 6px; margin: .5rem 0; }
+        .badge { display: inline-block; font-size: .7rem; padding: .2rem .6rem; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+        .badge-gambar { background: #dbeafe; color: #1d4ed8; }
+        .badge-video { background: #fee2e2; color: #b91c1c; }
+        .badge-link { background: #dcfce7; color: #15803d; }
+        .badge-dokumen { background: #fef3c7; color: #b45309; }
+
+        #fileField, #linkField { display: none; }
+        #fileField.active, #linkField.active { display: block; }
+
+        footer { text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: .85rem; }
+    </style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Lewati ke konten utama</a>
+
+<header class="topbar">
+    <a href="/" class="brand">Beranda Tugas</a>
+    <div class="profil-menu">
+        <button type="button" class="profil-trigger" onclick="toggleDropdown(event)"
+                aria-haspopup="true" aria-expanded="false" aria-label="Menu profil">
+            <div class="profil-info">
+                <div class="nama" th:text="${profil.namaLengkap}">Naufal Ramadhan</div>
+                <div class="nim" th:text="${profil.nim}">1247050103</div>
+                <div class="role">Mahasiswa</div>
+            </div>
+            <img class="avatar" th:src="${profil.fotoUrl}" alt="Foto profil" width="44" height="44">
+        </button>
+        <nav class="dropdown" id="dropdownProfil" aria-label="Menu profil">
+            <a href="/profil">👤 Profil</a>
+            <a href="/profil/cv">📄 CV</a>
+            <a href="/upload">📤 Upload Tugas</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+    <h1>Upload Tugas</h1>
+
+    <div class="alert alert-success" th:if="${sukses}" role="status" th:text="${sukses}"></div>
+    <div class="alert alert-error" th:if="${error}" role="alert" th:text="${error}"></div>
+
+    <section class="card">
+        <h2>Form Upload</h2>
+        <form method="post" action="/upload" enctype="multipart/form-data">
+
+            <fieldset>
+                <legend>Informasi Tugas</legend>
+
+                <label for="judul">Judul Tugas *</label>
+                <input type="text" id="judul" name="judul" required
+                       placeholder="Contoh: Tugas 1 - Landing Page">
+
+                <label for="deskripsi">Deskripsi</label>
+                <textarea id="deskripsi" name="deskripsi" rows="3"
+                          placeholder="Deskripsi singkat tugas"></textarea>
+
+                <label for="jenis">Jenis Tugas *</label>
+                <select id="jenis" name="jenis" required onchange="toggleField(this.value)">
+                    <option value="">-- Pilih Jenis --</option>
+                    <option value="gambar">Gambar</option>
+                    <option value="video">Video</option>
+                    <option value="link">Link</option>
+                    <option value="dokumen">Dokumen (PDF, DOC, PPT, XLS)</option>
+                </select>
+            </fieldset>
+
+            <fieldset id="fileField">
+                <legend>Berkas</legend>
+                <label for="file">Pilih File</label>
+                <input type="file" id="file" name="file"
+                       accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt">
+                <small style="color:#64748b;">Maks 50 MB. Format: JPG, PNG, GIF, MP4, WebM, PDF, DOC, PPT, XLS.</small>
+            </fieldset>
+
+            <fieldset id="linkField">
+                <legend>Tautan (Link)</legend>
+                <label for="link">URL Tugas</label>
+                <input type="url" id="link" name="link" placeholder="https://contoh.com/tugas">
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary">Unggah Tugas</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Daftar Tugas Terunggah</h2>
+
+        <p th:if="${#lists.isEmpty(daftarTugas)}" style="color:#64748b;">
+            Belum ada tugas yang diunggah.
+        </p>
+
+        <div class="list-tugas" th:unless="${#lists.isEmpty(daftarTugas)}">
+            <article class="tugas" th:each="t : ${daftarTugas}">
+                <span class="badge" th:classappend="'badge-' + ${t.jenis}" th:text="${t.jenis}"></span>
+                <h3 th:text="${t.judul}">Judul</h3>
+                <p th:text="${t.deskripsi}" style="font-size:.85rem;color:#64748b;">Deskripsi</p>
+
+                <img th:if="${t.jenis == 'gambar'}" th:src="${t.fileUrl}" th:alt="${t.judul}">
+                <video th:if="${t.jenis == 'video'}" th:src="${t.fileUrl}" controls></video>
+
+                <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+                    <a th:if="${t.jenis == 'link'}" th:href="${t.fileUrl}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="btn btn-primary" style="text-decoration:none;font-size:.8rem;">Buka</a>
+                    <a th:unless="${t.jenis == 'link'}" th:href="${t.fileUrl}"
+                       download class="btn btn-primary" style="text-decoration:none;font-size:.8rem;">Download</a>
+
+                    <form th:action="@{'/upload/hapus/' + ${t.id}}" method="post"
+                          onsubmit="return confirm('Hapus tugas ini?');" style="flex:1;">
+                        <button type="submit" class="btn btn-danger" style="width:100%;font-size:.8rem;">Hapus</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2026 Tugas Saya</p>
+</footer>
+
+<script>
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('dropdownProfil');
+        const open = dd.classList.toggle('show');
+        e.currentTarget.setAttribute('aria-expanded', open);
+    }
+    document.addEventListener('click', () => document.getElementById('dropdownProfil').classList.remove('show'));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('dropdownProfil').classList.remove('show'); });
+
+    function toggleField(jenis) {
+        const fileField = document.getElementById('fileField');
+        const linkField = document.getElementById('linkField');
+        const fileInput = document.getElementById('file');
+        const linkInput = document.getElementById('link');
+
+        fileField.classList.remove('active');
+        linkField.classList.remove('active');
+        fileInput.required = false;
+        linkInput.required = false;
+
+        if (jenis === 'link') {
+            linkField.classList.add('active');
+            linkInput.required = true;
+        } else if (jenis) {
+            fileField.classList.add('active');
+            fileInput.required = true;
+        }
+    }
+</script>
+</body>
+</html>

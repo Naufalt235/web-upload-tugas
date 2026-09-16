@@ -1,0 +1,18 @@
+# Maven
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Upload files user (jangan di-commit)
+src/main/resources/static/uploads/*
+!src/main/resources/static/uploads/.gitkeep
