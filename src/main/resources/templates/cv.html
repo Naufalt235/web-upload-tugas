@@ -24,7 +24,7 @@
         }
         .skip-link:focus { left: 0; }
 
-        /* ====== TOPBAR (sama seperti halaman lain) ====== */
+        /* ====== TOPBAR ====== */
         header.topbar {
             background: #fff; padding: .9rem 1.5rem;
             display: flex; justify-content: space-between; align-items: center;
@@ -132,7 +132,7 @@
             display: inline-block;
         }
 
-        /* ====== DATA PRIBADI (grid label:value) ====== */
+        /* ====== DATA PRIBADI ====== */
         .data-list {
             display: grid;
             grid-template-columns: 180px 1fr;
@@ -231,6 +231,64 @@
         .exp-item .exp-desc ul { padding-left: 1rem; }
         .exp-item .exp-desc li { margin-bottom: .25rem; }
 
+        /* ====== TABEL MATA KULIAH ====== */
+        .tabel-matkul {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: .85rem;
+        }
+        .tabel-matkul caption {
+            text-align: left;
+            font-weight: 600;
+            padding-bottom: .75rem;
+            color: #334155;
+            font-size: .9rem;
+        }
+        .tabel-matkul th,
+        .tabel-matkul td {
+            padding: .55rem .65rem;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            vertical-align: top;
+        }
+        .tabel-matkul thead th {
+            background: #6366f1;
+            color: #fff;
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+        .tabel-matkul tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .tabel-matkul tbody tr:hover {
+            background: #eef2ff;
+        }
+        .tabel-matkul tfoot th,
+        .tabel-matkul tfoot td {
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: 700;
+        }
+
+        /* ====== INFO AKADEMIK ====== */
+        .info-akademik {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: .75rem;
+            margin-bottom: 1rem;
+            font-size: .88rem;
+        }
+        .info-akademik div {
+            background: #f8fafc;
+            padding: .6rem .9rem;
+            border-radius: 6px;
+            border-left: 3px solid #6366f1;
+        }
+        .info-akademik strong { color: #334155; }
+
         /* ====== TOMBOL PRINT ====== */
         .print-btn {
             display: inline-flex;
@@ -268,6 +326,11 @@
             .data-list { grid-template-columns: 1fr; }
             .data-list dt { font-size: .85rem; padding-top: .4rem; }
             .edu-item { grid-template-columns: 1fr; gap: .25rem; }
+            .tabel-matkul {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
         }
 
         /* ====== PRINT ====== */
@@ -276,6 +339,9 @@
             header.topbar, footer, .print-wrap { display: none !important; }
             .cv-paper { box-shadow: none; border-radius: 0; }
             main { margin: 0; padding: 0; max-width: 100%; }
+            .tabel-matkul { font-size: .75rem; }
+            .tabel-matkul th,
+            .tabel-matkul td { padding: .35rem .4rem; }
         }
     </style>
 </head>
@@ -368,9 +434,9 @@
                 </li>
                 <li>
                     <span class="kontak-icon" aria-hidden="true">🌐</span>
-                    <a href="https://github.com/Naufalt235"
+                    <a href="https://github.com/naufalramadhan"
                        target="_blank" rel="noopener noreferrer">
-                        github.com/Naufalt235
+                        github.com/naufalramadhan
                     </a>
                 </li>
             </ul>
@@ -393,7 +459,7 @@
             <h2 id="judul-pendidikan" class="section-title">Pendidikan</h2>
 
             <div class="edu-item">
-                <div class="edu-year">2024 — Sekarang</div>
+                <div class="edu-year">2023 — Sekarang</div>
                 <div class="edu-detail">
                     <h3>UIN Sunan Gunung Djati Bandung</h3>
                     <p>Program Studi Teknik Informatika</p>
@@ -401,7 +467,7 @@
             </div>
 
             <div class="edu-item">
-                <div class="edu-year">2021 — 2024</div>
+                <div class="edu-year">2020 — 2023</div>
                 <div class="edu-detail">
                     <h3>SMK Pasundan Jatinangor</h3>
                     <p>Sekolah Menengah Kejuruan</p>
@@ -427,9 +493,116 @@
             </div>
         </section>
 
+        <!-- ========== MATA KULIAH SEMESTER INI ========== -->
+        <section class="cv-section" aria-labelledby="judul-matakuliah">
+            <h2 id="judul-matakuliah" class="section-title">Mata Kuliah Semester Ini</h2>
+
+            <div class="info-akademik">
+                <div><strong>Tahun Akademik:</strong> 2026/2027 Ganjil</div>
+                <div><strong>Program Studi:</strong> S1 Teknik Informatika</div>
+                <div><strong>IP Semester Lalu:</strong> 4.00</div>
+                <div><strong>Maksimal SKS:</strong> 24</div>
+            </div>
+
+            <table class="tabel-matkul">
+                <caption>Daftar mata kuliah semester 5 (2026/2027 Ganjil)</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Kode</th>
+                        <th scope="col">Mata Kuliah</th>
+                        <th scope="col">Kelas</th>
+                        <th scope="col">SKS</th>
+                        <th scope="col">Jadwal</th>
+                        <th scope="col">Dosen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>20100470501024</td>
+                        <td>Manajemen Basis Data</td>
+                        <td>C</td>
+                        <td>3</td>
+                        <td>Rabu 07:00–09:30</td>
+                        <td>Wildan Budiawan Zulfikar, S.T., M.Kom.</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>20100470501030</td>
+                        <td>Pengembangan Aplikasi Web</td>
+                        <td>C</td>
+                        <td>3</td>
+                        <td>Kamis 12:40–15:10</td>
+                        <td>Muhammad Deden Firdaus, ST, M.Kom</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>20100470501034</td>
+                        <td>Manajemen Proyek Perangkat Lunak</td>
+                        <td>C</td>
+                        <td>3</td>
+                        <td>Senin 12:40–15:10</td>
+                        <td>Agung Wahana, S.E., M.T.</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>20100470501028</td>
+                        <td>Pengembangan Aplikasi Mobile</td>
+                        <td>C</td>
+                        <td>3</td>
+                        <td>Selasa 12:40–15:10</td>
+                        <td>H. Aldy Rialdy Atmadja, M.T</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>20100470502009</td>
+                        <td>Sejarah Peradaban Islam</td>
+                        <td>A</td>
+                        <td>2</td>
+                        <td>Selasa 08:40–10:20</td>
+                        <td>Dr. Gina Giftia Azmiana Delliah</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>20100470501026</td>
+                        <td>Jaringan Komputer</td>
+                        <td>C</td>
+                        <td>3</td>
+                        <td>Kamis 09:30–12:00</td>
+                        <td>Cecep Nurul Alam, M.T.</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>20100470501033</td>
+                        <td>Intelegensia Buatan</td>
+                        <td>D</td>
+                        <td>3</td>
+                        <td>Jumat 12:40–15:10</td>
+                        <td>Jumadi, ST., M.Cs.</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>20100470501032</td>
+                        <td>Interaksi Manusia dan Komputer</td>
+                        <td>D</td>
+                        <td>3</td>
+                        <td>Kamis 07:00–09:30</td>
+                        <td>Dr. Cepy Slamet, S.T., M.Kom.</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="4">Total SKS</th>
+                        <td colspan="3"><strong>23 SKS</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
     </article>
 
-    <!-- Tombol Print (opsional, hilang saat diprint) -->
+    <!-- Tombol Print -->
     <div class="print-wrap">
         <button type="button" class="print-btn" onclick="window.print()">
             🖨️ Cetak / Simpan sebagai PDF
