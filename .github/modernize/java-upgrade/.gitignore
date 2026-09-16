@@ -1,9 +1,0 @@
-# IDE
-.vscode/
-
-# Maven
-target/
-
-# Upload files
-src/main/resources/static/uploads/*
-!src/main/resources/static/uploads/.gitkeep
