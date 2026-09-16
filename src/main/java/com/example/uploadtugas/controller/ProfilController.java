@@ -1,15 +1,15 @@
 package com.example.uploadtugas.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.uploadtugas.model.Profil;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.*;
-import java.util.UUID;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/profil")
@@ -17,14 +17,13 @@ public class ProfilController {
 
     private static final Profil profil = new Profil();
 
-    @Value("${upload.dir}")
-    private String uploadDir;
+    @Autowired
+    private Cloudinary cloudinary;
 
     public static Profil getProfil() {
         return profil;
     }
 
-    // Halaman profil — form edit
     @GetMapping
     public String halamanProfil(Model model) {
         model.addAttribute("profil", profil);
@@ -32,7 +31,6 @@ public class ProfilController {
         return "profil";
     }
 
-    // Update nama & NIM
     @PostMapping("/update")
     public String updateProfil(
             @RequestParam("namaDepan") String namaDepan,
@@ -48,7 +46,6 @@ public class ProfilController {
         return "profil";
     }
 
-    // Upload foto profil
     @PostMapping("/upload-foto")
     public String uploadFoto(@RequestParam("foto") MultipartFile file, Model model) {
         try {
@@ -57,22 +54,20 @@ public class ProfilController {
                 if (contentType == null || !contentType.startsWith("image/")) {
                     model.addAttribute("error", "File harus berupa gambar!");
                 } else {
-                    Path uploadPath = Paths.get(uploadDir);
-                    if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+                    Map uploadResult = cloudinary.uploader().upload(
+                            file.getBytes(),
+                            ObjectUtils.asMap(
+                                    "folder", "web-upload-tugas/profil",
+                                    "resource_type", "image"
+                            )
+                    );
 
-                    String original = file.getOriginalFilename();
-                    String ext = original != null && original.contains(".")
-                            ? original.substring(original.lastIndexOf(".")) : ".jpg";
-                    String namaUnik = "profil_" + UUID.randomUUID() + ext;
-                    Files.copy(file.getInputStream(),
-                            uploadPath.resolve(namaUnik),
-                            StandardCopyOption.REPLACE_EXISTING);
-
-                    profil.setFotoUrl("/uploads/" + namaUnik);
+                    String secureUrl = (String) uploadResult.get("secure_url");
+                    profil.setFotoUrl(secureUrl);
                     model.addAttribute("sukses", "Foto profil berhasil diperbarui!");
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             model.addAttribute("error", "Gagal upload: " + e.getMessage());
         }
         model.addAttribute("profil", profil);
@@ -80,7 +75,6 @@ public class ProfilController {
         return "profil";
     }
 
-    // Halaman CV
     @GetMapping("/cv")
     public String halamanCv(Model model) {
         model.addAttribute("profil", profil);

@@ -16,7 +16,7 @@
     <artifactId>upload-tugas</artifactId>
     <version>1.0.0</version>
     <name>upload-tugas</name>
-    <description>Web upload tugas dengan Spring Boot</description>
+    <description>Web upload tugas dengan Spring Boot dan Cloudinary</description>
 
     <properties>
         <java.version>17</java.version>
@@ -24,16 +24,26 @@
     </properties>
 
     <dependencies>
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+        <!-- Cloudinary untuk storage file -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.36.0</version>
+        </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

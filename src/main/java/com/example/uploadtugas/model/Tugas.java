@@ -8,6 +8,7 @@ public class Tugas {
     private String fileUrl;
     private String originalName;
     private long size;
+    private String publicId;   // untuk hapus file di Cloudinary
 
     public Tugas() {}
 
@@ -22,7 +23,6 @@ public class Tugas {
         this.size = size;
     }
 
-    // Getter & Setter
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -43,4 +43,7 @@ public class Tugas {
 
     public long getSize() { return size; }
     public void setSize(long size) { this.size = size; }
+
+    public String getPublicId() { return publicId; }
+    public void setPublicId(String publicId) { this.publicId = publicId; }
 }

@@ -1,23 +1,24 @@
 package com.example.uploadtugas.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.uploadtugas.model.Tugas;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
 public class UploadController {
 
-    @Value("${upload.dir}")
-    private String uploadDir;
+    @Autowired
+    private Cloudinary cloudinary;
 
     private static final List<Tugas> daftarTugas = new ArrayList<>();
 
@@ -44,6 +45,7 @@ public class UploadController {
 
         try {
             String fileUrl = null;
+            String publicId = null;
             String originalName = null;
             long size = 0;
 
@@ -59,6 +61,7 @@ public class UploadController {
                     model.addAttribute("error", "File wajib diupload!");
                     return reload(model);
                 }
+
                 String contentType = file.getContentType();
                 if ("gambar".equals(jenis) && (contentType == null || !contentType.startsWith("image/"))) {
                     model.addAttribute("error", "File harus berupa gambar!");
@@ -83,35 +86,40 @@ public class UploadController {
                     }
                 }
 
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+                String resourceType = "auto";
+                if ("video".equals(jenis)) resourceType = "video";
+                if ("dokumen".equals(jenis)) resourceType = "raw";
 
+                Map uploadResult = cloudinary.uploader().upload(
+                        file.getBytes(),
+                        ObjectUtils.asMap(
+                                "folder", "web-upload-tugas/tugas",
+                                "resource_type", resourceType,
+                                "use_filename", true,
+                                "unique_filename", true
+                        )
+                );
+
+                fileUrl = (String) uploadResult.get("secure_url");
+                publicId = (String) uploadResult.get("public_id");
                 originalName = file.getOriginalFilename();
-                String ext = originalName != null && originalName.contains(".")
-                        ? originalName.substring(originalName.lastIndexOf(".")) : "";
-                String namaUnik = UUID.randomUUID() + ext;
-                Files.copy(file.getInputStream(),
-                        uploadPath.resolve(namaUnik),
-                        StandardCopyOption.REPLACE_EXISTING);
-
-                fileUrl = "/uploads/" + namaUnik;
                 size = file.getSize();
             }
 
             Tugas tugas = new Tugas(UUID.randomUUID().toString(), jenis, judul,
                     deskripsi == null ? "" : deskripsi,
                     fileUrl, originalName, size);
+            tugas.setPublicId(publicId);
             daftarTugas.add(tugas);
 
             model.addAttribute("sukses", "Tugas berhasil diupload!");
-        } catch (IOException e) {
+        } catch (Exception e) {
             model.addAttribute("error", "Gagal upload: " + e.getMessage());
         }
 
         return reload(model);
     }
 
-    // Hapus tugas
     @PostMapping("/upload/hapus/{id}")
     public String hapusTugas(@PathVariable String id, Model model) {
         Tugas target = null;
@@ -119,13 +127,17 @@ public class UploadController {
             if (t.getId().equals(id)) { target = t; break; }
         }
         if (target != null) {
-            // Hapus file fisik kalau bukan link
-            if (!"link".equals(target.getJenis()) && target.getFileUrl() != null) {
+            if (!"link".equals(target.getJenis()) && target.getPublicId() != null) {
                 try {
-                    String namaFile = target.getFileUrl().replace("/uploads/", "");
-                    Path p = Paths.get(uploadDir).resolve(namaFile);
-                    Files.deleteIfExists(p);
-                } catch (IOException ignored) {}
+                    String resourceType = "auto";
+                    if ("video".equals(target.getJenis())) resourceType = "video";
+                    if ("dokumen".equals(target.getJenis())) resourceType = "raw";
+
+                    cloudinary.uploader().destroy(
+                            target.getPublicId(),
+                            ObjectUtils.asMap("resource_type", resourceType)
+                    );
+                } catch (Exception ignored) {}
             }
             daftarTugas.remove(target);
             model.addAttribute("sukses", "Tugas berhasil dihapus!");

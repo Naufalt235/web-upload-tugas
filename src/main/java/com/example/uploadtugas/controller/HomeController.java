@@ -1,6 +1,5 @@
 package com.example.uploadtugas.controller;
 
-import com.example.uploadtugas.model.Profil;
 import com.example.uploadtugas.model.Tugas;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
